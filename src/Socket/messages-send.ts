@@ -533,10 +533,10 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				const stanza: BinaryNode = {
 					tag: 'message',
 					attrs: {
-						id: msgId!,
-						type: isNewsletter ? getTypeMessage(message) : getMessageType(message),
-						...(additionalAttributes || {})
-					},
+                    id: msgId,
+                    type: isNewsletter ? getTypeMessage(message) : 'text',
+                    ...(additionalAttributes || {})
+                },
 					content: binaryNodeContent
 				}
 				// if the participant to send to is explicitly specified (generally retry recp)
@@ -620,27 +620,35 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 		return 'text'
 	}
 
-	const getTypeMessage = (msg: proto.IMessage) => {
-		if (msg.viewOnceMessage) {
-			return getTypeMessage(msg.viewOnceMessage.message!)
-		} else if (msg.viewOnceMessageV2) {
-			return getTypeMessage(msg.viewOnceMessageV2.message!)
-		} else if (msg.viewOnceMessageV2Extension) {
-			return getTypeMessage(msg.viewOnceMessageV2Extension.message!)
-		} else if (msg.ephemeralMessage) {
-			return getTypeMessage(msg.ephemeralMessage.message!)
-		} else if (msg.documentWithCaptionMessage) {
-			return getTypeMessage(msg.documentWithCaptionMessage.message!)
-		} else if (msg.reactionMessage) {
-			return 'reaction'
-		} else if (msg.pollCreationMessage || msg.pollCreationMessageV2 || msg.pollCreationMessageV3 || msg.pollUpdateMessage) {
-			return 'poll'
-		} else if (getMediaType(msg)) {
-			return 'media'
-		} else {
-			return 'text'
-		}
-	}
+	  const getTypeMessage = (msg) => {
+        if (msg.viewOnceMessage) {
+            return getTypeMessage(msg.viewOnceMessage.message);
+        }
+        else if (msg.viewOnceMessageV2) {
+            return getTypeMessage(msg.viewOnceMessageV2.message);
+        }
+        else if (msg.viewOnceMessageV2Extension) {
+            return getTypeMessage(msg.viewOnceMessageV2Extension.message);
+        }
+        else if (msg.ephemeralMessage) {
+            return getTypeMessage(msg.ephemeralMessage.message);
+        }
+        else if (msg.documentWithCaptionMessage) {
+            return getTypeMessage(msg.documentWithCaptionMessage.message);
+        }
+        else if (msg.reactionMessage) {
+            return 'reaction';
+        }
+        else if (msg.pollCreationMessage || msg.pollCreationMessageV2 || msg.pollCreationMessageV3 || msg.pollUpdateMessage) {
+            return 'poll';
+        }
+        else if (getMediaType(msg)) {
+            return 'media';
+        }
+        else {
+            return 'text';
+        }
+    };
 
 	const getMediaType = (message: proto.IMessage) => {
 		if(message.imageMessage) {
